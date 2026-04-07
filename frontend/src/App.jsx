@@ -1,63 +1,52 @@
-import { useState, useEffect } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import { ShoppingCart, LogIn, LogOut, Package } from 'lucide-react';
+import Products from './pages/Products';
+import Cart from './pages/Cart';
+import Login from './pages/Login';
+import { useCart } from './CartContext';
 import './App.css';
 
 function App() {
-  const [users, setUsers] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-
-  useEffect(() => {
-    fetch('http://localhost:3001/users')
-      .then(res => res.json())
-      .then(data => setUsers(data))
-      .catch(console.error);
-
-    fetch('http://localhost:3002/products')
-      .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(console.error);
-
-    fetch('http://localhost:3003/orders')
-      .then(res => res.json())
-      .then(data => setOrders(data))
-      .catch(console.error);
-  }, []);
+  const { cart, user, setUser } = useCart();
+  const cartSize = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="App">
-      <header>
-        <h1>Microservices Dashboard</h1>
-      </header>
-      <main className="dashboard">
-        <section className="card">
-          <h2>Users Service</h2>
-          <ul>
-            {users.map(u => (
-              <li key={u.id}>{u.name} ({u.email})</li>
-            ))}
-          </ul>
-        </section>
+    <div className="app-container">
+      <nav className="navbar">
+        <div className="nav-brand">
+          <Link to="/">
+            <Package className="brand-icon" />
+            <span className="brand-name">NexoraShop</span>
+          </Link>
+        </div>
+        <div className="nav-links">
+          <Link to="/" className="nav-link">Products</Link>
+          <Link to="/cart" className="nav-link cart-link">
+            <ShoppingCart size={20} />
+            {cartSize > 0 && <span className="cart-badge">{cartSize}</span>}
+          </Link>
+          {user ? (
+            <div className="user-menu">
+               <span className="welcome">Hi, {user.name.split(' ')[0]}</span>
+               <button onClick={() => setUser(null)} className="btn-icon"><LogOut size={20} /></button>
+            </div>
+          ) : (
+            <Link to="/login" className="nav-link"><LogIn size={20} /> Login</Link>
+          )}
+        </div>
+      </nav>
 
-        <section className="card">
-          <h2>Products Service</h2>
-          <ul>
-            {products.map(p => (
-              <li key={p.id}>{p.name} - ${p.price}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="card">
-          <h2>Orders Service</h2>
-          <ul>
-            {orders.map(o => (
-              <li key={o.id}>
-                Order #{o.id} - User {o.userId} bought Product {o.productId} [{o.status}]
-              </li>
-            ))}
-          </ul>
-        </section>
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
       </main>
+
+      <footer className="footer">
+        <p>&copy; 2026 Nexora E-Commerce. Powered by Docker Microservices.</p>
+      </footer>
     </div>
   );
 }
