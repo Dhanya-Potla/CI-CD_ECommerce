@@ -7,7 +7,7 @@ export default function Home() {
     <div className="home-page">
       <section className="hero-landing">
         <div className="hero-content">
-          <h1>Welcome to the Future of Commerce</h1>
+          <h1>Welcome to the Future of Commerce 0</h1>
           <p className="hero-subtitle">
             Experience blazing-fast shopping powered by containerized microservices and edge computing.
           </p>
